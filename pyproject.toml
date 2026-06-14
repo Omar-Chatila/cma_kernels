@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kernelcma"
+version = "0.1.0"
+description = "Standalone state-kernel generation from annotated movement trajectories"
+requires-python = ">=3.9"
+authors = [
+    { name = "Omar Chatila" },
+    { name = "Mart Hagedoorn" },
+    { name = "Kevin Buchin" },
+]
+dependencies = [
+    "geopandas",
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+]
+
+[tool.setuptools]
+packages = ["kernelcma"]
+package-dir = { "kernelcma" = "." }
