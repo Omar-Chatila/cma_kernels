@@ -19,7 +19,15 @@ def generate_heatmap(axs, coords, rnge, reso):
     )
 
 
-def create_and_plot_kernels(state_steps, rnge, reso, output_dir=None, state_values=None):
+def create_and_plot_kernels(
+    state_steps,
+    rnge,
+    reso,
+    output_dir=None,
+    state_values=None,
+    density_config=None,
+    **density_kwargs,
+):
     import matplotlib.pyplot as plt
 
     state_values = list(range(len(state_steps))) if state_values is None else list(state_values)
@@ -38,7 +46,14 @@ def create_and_plot_kernels(state_steps, rnge, reso, output_dir=None, state_valu
         density = None
         if len(steps) >= 3:
             generate_heatmap(axs[0, idx], steps, rnge, reso)
-            density = fit_gaussian_density(axs[1, idx], steps, rnge, reso)
+            density = fit_gaussian_density(
+                axs[1, idx],
+                steps,
+                rnge,
+                reso,
+                config=density_config,
+                **density_kwargs,
+            )
         densities.append(density)
         linked_pairs.append((axs[0, idx], axs[1, idx]))
 

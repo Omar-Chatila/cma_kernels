@@ -33,7 +33,15 @@ class StateKernelFactory:
         )
         return self.trajectories, self.dt_threshold, self.state_values
 
-    def get_state_kernels(self, dt_tolerance, rnge, reso, out=None):
+    def get_state_kernels(
+        self,
+        dt_tolerance,
+        rnge,
+        reso,
+        out=None,
+        density_config=None,
+        **density_kwargs,
+    ):
         if self.trajectories is None:
             self.build_trajectories()
         return state_kernels_from_trajectories(
@@ -44,6 +52,8 @@ class StateKernelFactory:
             rnge,
             reso,
             out,
+            density_config=density_config,
+            **density_kwargs,
         )
 
 
@@ -55,6 +65,8 @@ def state_kernels_from_trajectories(
     rnge,
     reso,
     out=None,
+    density_config=None,
+    **density_kwargs,
 ):
     dx = 2 * rnge / reso
     print(f"dx: {dx}\n")
@@ -67,6 +79,8 @@ def state_kernels_from_trajectories(
         reso,
         out,
         state_values=state_values,
+        density_config=density_config,
+        **density_kwargs,
     )
     brw_densities = pure_brw_grouped(
         dt_threshold,
@@ -76,6 +90,8 @@ def state_kernels_from_trajectories(
         reso,
         out,
         state_values=state_values,
+        density_config=density_config,
+        **density_kwargs,
     )
 
     correlated = tuple(
@@ -99,11 +115,21 @@ def pure_cor_grouped(
     out=None,
     num_states=None,
     state_values=None,
+    density_config=None,
+    **density_kwargs,
 ):
     if state_values is None and num_states is not None:
         state_values = list(range(1, num_states + 1))
     steps = calculate_steps_cor_grouped(dt_threshold, dt_tolerance, animal_trajectories, state_values)
-    return create_and_plot_kernels(steps, rnge, reso, out, state_values=state_values)
+    return create_and_plot_kernels(
+        steps,
+        rnge,
+        reso,
+        out,
+        state_values=state_values,
+        density_config=density_config,
+        **density_kwargs,
+    )
 
 
 def pure_brw_grouped(
@@ -115,8 +141,18 @@ def pure_brw_grouped(
     out=None,
     num_states=None,
     state_values=None,
+    density_config=None,
+    **density_kwargs,
 ):
     if state_values is None and num_states is not None:
         state_values = list(range(1, num_states + 1))
     steps = calculate_steps_brownian_grouped(dt_threshold, dt_tolerance, animal_trajectories, state_values)
-    return create_and_plot_kernels(steps, rnge, reso, out, state_values=state_values)
+    return create_and_plot_kernels(
+        steps,
+        rnge,
+        reso,
+        out,
+        state_values=state_values,
+        density_config=density_config,
+        **density_kwargs,
+    )

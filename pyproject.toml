@@ -13,7 +13,10 @@ authors = [
     { name = "Kevin Buchin" },
 ]
 dependencies = [
+    "movingpandas",
     "geopandas",
+    "hmmlearn",
+    "pytest",
     "matplotlib",
     "numpy",
     "pandas",
