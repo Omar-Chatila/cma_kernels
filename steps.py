@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def rotate_vector(a, b, c):
     import numpy as np
 
@@ -55,11 +58,16 @@ def calculate_steps_cor_grouped(
     return steps
 
 
+def delta_vector(dx, dy, scale=1.0):
+    return np.array([dx, dy], dtype=float) * scale
+
+
 def calculate_steps_brownian_grouped(
     dt_threshold,
     dt_tolerance,
     animal_trajectories,
     state_values=None,
+    brownian_dt=1.0,
 ):
     state_values = _resolve_state_values(animal_trajectories, state_values)
     steps = [[] for _ in state_values]
@@ -81,7 +89,8 @@ def calculate_steps_brownian_grouped(
 
                 dx = entries[i][0] - entries[i - 1][0]
                 dy = entries[i][1] - entries[i - 1][1]
-                steps[state_index].append((dx, dy))
+                scale = 1.0 if brownian_dt is None else min(1.0, float(brownian_dt) / time_diff)
+                steps[state_index].append(delta_vector(dx, dy, scale=scale))
             else:
                 count_discarded += 1
 

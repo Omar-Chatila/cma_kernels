@@ -1,4 +1,5 @@
 from .gaussian import fit_gaussian_density
+from .postprocessing import clip_density_to_mass
 
 updating = False
 
@@ -26,6 +27,9 @@ def create_and_plot_kernels(
     output_dir=None,
     state_values=None,
     density_config=None,
+    mass_percentile=0.99,
+    title=None,
+    return_kernel_info=False,
     **density_kwargs,
 ):
     import matplotlib.pyplot as plt
@@ -36,7 +40,10 @@ def create_and_plot_kernels(
         return []
 
     fig, axs = plt.subplots(2, state_count, figsize=(4 * state_count, 6), squeeze=False)
+    if title:
+        fig.suptitle(title)
     densities = []
+    kernel_infos = []
     linked_pairs = []
 
     for idx, steps in enumerate(state_steps):
@@ -44,17 +51,33 @@ def create_and_plot_kernels(
         axs[1, idx].set_title(f"State {state_values[idx]} density")
 
         density = None
+        info = None
         if len(steps) >= 3:
-            generate_heatmap(axs[0, idx], steps, rnge, reso)
             density = fit_gaussian_density(
-                axs[1, idx],
-                steps,
-                rnge,
-                reso,
+                axs=None,
+                steps=steps,
+                rnge=rnge,
+                reso=reso,
                 config=density_config,
                 **density_kwargs,
             )
+            info = clip_density_to_mass(density, rnge, mass_percentile)
+            display_rnge = info.rnge if info.Z is not None else rnge
+            generate_heatmap(axs[0, idx], steps, display_rnge, info.reso or reso)
+            if info.Z is not None:
+                axs[1, idx].imshow(
+                    info.Z,
+                    extent=(-display_rnge, display_rnge, -display_rnge, display_rnge),
+                    origin="lower",
+                    cmap="viridis",
+                    interpolation="nearest",
+                )
+                axs[1, idx].set_title(
+                    f"State {state_values[idx]} density\n"
+                    f"r={display_rnge:.1f}, mass={info.retained_mass:.3f}"
+                )
         densities.append(density)
+        kernel_infos.append(info)
         linked_pairs.append((axs[0, idx], axs[1, idx]))
 
     def on_xlim_changed(event_ax):
@@ -82,4 +105,6 @@ def create_and_plot_kernels(
 
     if output_dir is not None:
         plt.savefig(output_dir, bbox_inches="tight")
+    if return_kernel_info:
+        return kernel_infos
     return densities

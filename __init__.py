@@ -4,11 +4,13 @@ from importlib import import_module
 
 _EXPORTS = {
     "Kernel2D": "types",
+    "KernelClip": "postprocessing",
     "StateKernelFactory": "factory",
     "build_state_trajectories": "trajectories",
     "calculate_steps_brownian_grouped": "steps",
     "calculate_steps_cor_grouped": "steps",
     "create_and_plot_kernels": "plotting",
+    "clip_density_to_mass": "postprocessing",
     "DENSITY_PRESETS": "gaussian",
     "DensityConfigurationError": "gaussian",
     "fit_gaussian_density": "gaussian",
